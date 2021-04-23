@@ -23,4 +23,4 @@ const collectionSchema = new mongoose.Schema(
     { timestamps: true },
 );
 
-export default collectionSchema;
+export default mongoose.model("Collection", collectionSchema);

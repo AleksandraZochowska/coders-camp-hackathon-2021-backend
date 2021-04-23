@@ -26,4 +26,4 @@ const questionSchema = new mongoose.Schema(
     { timestamps: true },
 );
 
-export default questionSchema;
+export default mongoose.model("Question", questionSchema);
