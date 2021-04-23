@@ -4,8 +4,11 @@ import tokenVerification from "../middlewares/tokenVerification.js";
 
 const router = express.Router();
 
-//GET
+// GET
 router.get("/", tokenVerification, collectionController.getAllCollections);
 router.get("/:id", tokenVerification, collectionController.getCollectionById);
+
+// POST
+router.post("/", tokenVerification, collectionController.createCollection);
 
 export default router;

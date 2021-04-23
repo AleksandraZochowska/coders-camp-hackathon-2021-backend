@@ -1,11 +1,34 @@
 import Controller from "../Controller.js";
 import CollectionModel from "../../models/collections/collectionSchema.js";
+import { createCollectionValidation } from "./collectionValidation.js";
 import QuestionModel from "../../models/questions/questionSchema.js";
 import { UserModel } from "../../models/users/userSchema.js";
 
 class CollectionController extends Controller {
     constructor() {
         super();
+    }
+
+    async createCollection(req, res) {
+        const { error } = createCollectionValidation(req.body);
+        if (error) return this.showError(res, 400, error.details);
+
+        try {
+            const nameExists = await CollectionModel.findOne({ name: req.body.name, ownerId: req.userId });
+            if (nameExists) return this.showError(res, 400, "Question collection with this name already exists");
+
+            const collection = new CollectionModel({
+                name: req.body.name,
+                ownerId: req.userId,
+                questions: [],
+            });
+            await collection.save();
+
+            const result = (({ _id, name, questions }) => ({ _id, name, questions }))(collection);
+            return this.success(res, result);
+        } catch (error) {
+            return this.showError(res, 500);
+        }
     }
 
     async getAllCollections(req, res) {
@@ -17,9 +40,9 @@ class CollectionController extends Controller {
                 "questions",
             );
 
-            this.success(res, collections);
+            return this.success(res, collections);
         } catch (error) {
-            this.showError(res, 500, error);
+            return this.showError(res, 500, error);
         }
     }
 
@@ -31,9 +54,9 @@ class CollectionController extends Controller {
             const collection = await CollectionModel.findById(req.params.id, "name questions").populate("questions");
             if (!collection) return this.showError(res, 404, "Collection not found");
 
-            this.success(res, collection);
+            return this.success(res, collection);
         } catch (error) {
-            this.showError(res, 500, error);
+            return this.showError(res, 500, error);
         }
     }
 }
