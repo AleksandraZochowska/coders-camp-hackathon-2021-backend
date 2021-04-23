@@ -10,7 +10,7 @@ dotenv.config({ path: "./.env" });
 class Server {
     constructor() {
         this.app = express();
-        this.serverPort = process.env.PORT || 4000;
+        this.serverPort = process.env.SERVER_PORT || 4000;
         this.dbName = process.env.DB_NAME;
         this.mongoConnection;
         this._server;
