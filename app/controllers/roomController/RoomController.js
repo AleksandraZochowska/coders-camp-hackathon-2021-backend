@@ -1,15 +1,16 @@
 import Controller from "../Controller.js";
+// import RoomModel from "../../models/collections/roomSchema.js";
 
 class RoomController extends Controller {
     constructor() {
         super();
     }
 
-    createRoom() {}
+    // createRoom(req, res) {}
 
-    editRoom() {}
+    // editRoom(req, res) {}
 
-    updateGuest() {}
+    // updateGuest(req, res) {}
 }
 
 export default RoomController;
