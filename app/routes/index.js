@@ -1,5 +1,5 @@
 import users from "./users.js";
-import collections from "./collections";
+import collections from "./collections.js";
 
 export default (app) => {
     app.use("/api/users", users);
