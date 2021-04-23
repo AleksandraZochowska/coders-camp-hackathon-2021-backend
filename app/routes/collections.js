@@ -5,7 +5,7 @@ import tokenVerification from "../middlewares/tokenVerification.js";
 const router = express.Router();
 
 //GET
-router.get("/collections", tokenVerification, collectionController.getAllCollections);
-router.get("/collections/:id", tokenVerification, collectionController.getCollectionById);
+router.get("/", tokenVerification, collectionController.getAllCollections);
+router.get("/:id", tokenVerification, collectionController.getCollectionById);
 
 export default router;
