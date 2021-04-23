@@ -1,6 +1,6 @@
 import express from "express";
 
-import { getQuestionById } from "../controllers/questionCollections/index.js";
+import { getQuestionById } from "../controllers/questionController/index.js";
 const router = express.Router();
 
 // POST:
