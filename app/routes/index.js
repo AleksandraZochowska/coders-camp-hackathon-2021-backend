@@ -1,6 +1,5 @@
 import users from "./users.js";
 import questions from "./questions.js";
-
 import collections from "./collections.js";
 import rooms from "./rooms.js";
 
