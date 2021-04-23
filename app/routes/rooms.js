@@ -1,14 +1,14 @@
 import express from "express";
-import { createRoom, editRoom, updateGuest } from "../controllers/roomController/index.js";
+import * as roomController from "../controllers/roomController/index.js";
 import tokenVerification from "../middlewares/tokenVerification.js";
 
 const router = express.Router();
 
 // POST:
-router.post("/rooms", tokenVerification, createRoom);
-router.post("/rooms/:id/guests", tokenVerification, editRoom);
+router.post("/", tokenVerification, roomController.createRoom);
+router.post("/:id/guests", tokenVerification, roomController.editRoom);
 
 // PATCH:
-router.patch("/rooms/:id", updateGuest);
+router.patch("/:id", roomController.updateGuest);
 
 export default router;
