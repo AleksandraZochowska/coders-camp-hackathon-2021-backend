@@ -1,2 +1,7 @@
 # Project exclude paths
-/node_modules/
+
+/dist
+node_modules
+.env
+package-lock.json
+private
