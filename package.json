@@ -1,0 +1,36 @@
+{
+    "name": "trial-backend",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/AleksandraZochowska/backend-MI.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/AleksandraZochowska/backend-MI/issues"
+    },
+    "homepage": "https://github.com/AleksandraZochowska/backend-MI#readme",
+    "devDependencies": {
+        "nodemon": "^1.19.4"
+    },
+    "dependencies": {
+        "@hapi/joi": "^16.1.7",
+        "axios": "^0.21.1",
+        "bcrypt": "^5.0.1",
+        "cors": "^2.8.5",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.1",
+        "mongodb": "^3.5.3",
+        "mongoose": "^5.11.18"
+    }
+}
