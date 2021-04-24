@@ -9,3 +9,9 @@ export const getAllCollections = (req, res) => {
 export const getCollectionById = (req, res) => {
     collection.getCollectionById(req, res);
 };
+
+// PATCH:
+
+export const updateCollection = (req, res) => {
+    collection.updateCollection(req, res);
+};

@@ -8,4 +8,7 @@ const router = express.Router();
 router.get("/", tokenVerification, collectionController.getAllCollections);
 router.get("/:id", tokenVerification, collectionController.getCollectionById);
 
+//PATCH
+router.patch("/:id", tokenVerification, collectionController.updateCollection);
+
 export default router;
