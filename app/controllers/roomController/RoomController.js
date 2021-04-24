@@ -9,13 +9,30 @@ import QuestionModel from "../../models/questions/questionSchema.js";
 class RoomController extends Controller {
     constructor() {
         super();
+        this.populateQuery = [
+            {
+                path: "questionsCollectionId",
+                model: "Collection",
+                populate: {
+                    path: "questions",
+                    model: "Question",
+                },
+            },
+            {
+                path: "questionsAsked",
+                populate: {
+                    path: "_id",
+                    model: "Question",
+                },
+            },
+        ];
     }
     async getRooms(req, res) {
         const user = await UserModel.findById(req.userId);
         if (!user) return this.showError(res, 400, `You are not a logged user.`);
 
         try {
-            const rooms = await RoomModel.find({ ownerId: req.userId }).populate("questionsCollectionId");
+            const rooms = await RoomModel.find({ ownerId: req.userId }).populate(this.populateQuery);
             return this.success(res, rooms);
         } catch (err) {
             return this.showError(res, 500, err);
@@ -27,23 +44,7 @@ class RoomController extends Controller {
         if (!user) return this.showError(res, 400, `You are not a logged user.`);
 
         try {
-            const room = await RoomModel.findById(req.params.id).populate([
-                {
-                    path: "questionsCollectionId",
-                    model: "Collection",
-                    populate: {
-                        path: "questions",
-                        model: "Question",
-                    },
-                },
-                {
-                    path: "questionsAsked",
-                    populate: {
-                        path: "_id",
-                        model: "Question",
-                    },
-                },
-            ]);
+            const room = await RoomModel.findById(req.params.id).populate(this.populateQuery);
             if (`${room.ownerId}` != req.userId) this.showError(res, 401, `The room does not belons to you`);
             return this.success(res, room);
         } catch (err) {
