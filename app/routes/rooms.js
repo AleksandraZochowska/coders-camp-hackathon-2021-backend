@@ -6,9 +6,9 @@ const router = express.Router();
 
 // POST:
 router.post("/", tokenVerification, roomController.createRoom);
-router.post("/:id/guests", tokenVerification, roomController.editRoom);
+router.post("/:id/guests", roomController.updateGuest);
 
 // PATCH:
-router.patch("/:id", roomController.updateGuest);
+router.patch("/:id", tokenVerification, roomController.editRoom);
 
 export default router;
