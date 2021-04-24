@@ -74,12 +74,8 @@ class RoomController extends Controller {
     }
 
     async getRoomById(req, res) {
-        const user = await UserModel.findById(req.userId);
-        if (!user) return this.showError(res, 400, `You are not a logged user.`);
-
         try {
             const room = await RoomModel.findById(req.params.id).populate(this.populateQuery);
-            if (`${room.ownerId}` != req.userId) this.showError(res, 401, `The room does not belons to you`);
             return this.success(res, room);
         } catch (err) {
             return this.showError(res, 500, err);
