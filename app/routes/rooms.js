@@ -5,10 +5,11 @@ import tokenVerification from "../middlewares/tokenVerification.js";
 const router = express.Router();
 
 // GET
-router.get("", tokenVerification, roomController.getRooms);
+router.get("/:id/summary", tokenVerification, roomController.getSummary);
 router.get("/:id/answers", roomController.getAnswers);
 router.get("/:id/activequestion", roomController.getActiveQuestion);
 router.get("/:id", roomController.getRoomById);
+router.get("", tokenVerification, roomController.getRooms);
 
 // POST:
 router.post("/", tokenVerification, roomController.createRoom);
