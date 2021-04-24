@@ -13,7 +13,7 @@ const roomSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
-        questionsCollection: {
+        questionsCollectionId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Collection",
             required: true,
@@ -22,7 +22,7 @@ const roomSchema = new mongoose.Schema(
         questionsAsked: {
             type: [
                 {
-                    id: mongoose.Schema.Types.ObjectId,
+                    _id: mongoose.Schema.Types.ObjectId,
                     askedAt: Date,
                 },
             ],
@@ -34,6 +34,7 @@ const roomSchema = new mongoose.Schema(
             type: [
                 {
                     email: String,
+                    name: String,
                     answers: [
                         {
                             questionId: {
