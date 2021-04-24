@@ -12,6 +12,6 @@ router.post("/", tokenVerification, roomController.createRoom);
 
 // PATCH:
 router.patch("/:id", tokenVerification, roomController.editRoom);
-router.patch("/guests/:id", roomController.updateGuests);
+router.patch("/:id/guests", roomController.updateGuests);
 
 export default router;
