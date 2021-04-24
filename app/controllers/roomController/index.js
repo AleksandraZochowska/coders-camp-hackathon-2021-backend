@@ -5,6 +5,9 @@ const room = new RoomController();
 export const getRooms = (req, res) => {
     room.getRooms(req, res);
 };
+export const getRoomById = (req, res) => {
+    room.getRoomById(req, res);
+};
 // POST:
 export const createRoom = (req, res) => {
     room.createRoom(req, res);
@@ -16,4 +19,8 @@ export const editRoom = (req, res) => {
 
 export const updateGuests = (req, res) => {
     room.updateGuests(req, res);
+};
+
+export const answerQuestion = (req, res) => {
+    room.answerQuestion(req, res);
 };
