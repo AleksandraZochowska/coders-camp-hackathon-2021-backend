@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-export const tokenVerification = (req, res, next) => {
+const tokenVerification = (req, res, next) => {
     if (req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer") {
         const token = req.headers.authorization.split(" ")[1];
 
@@ -16,3 +16,5 @@ export const tokenVerification = (req, res, next) => {
         return res.status(401).json({ message: "Access denied, provide token" });
     }
 };
+
+export default tokenVerification;
