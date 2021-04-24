@@ -9,9 +9,9 @@ router.get("", tokenVerification, roomController.getRooms);
 
 // POST:
 router.post("/", tokenVerification, roomController.createRoom);
-router.post("/:id/guests", roomController.updateGuest);
 
 // PATCH:
 router.patch("/:id", tokenVerification, roomController.editRoom);
+router.patch("/guests/:id", roomController.updateGuests);
 
 export default router;

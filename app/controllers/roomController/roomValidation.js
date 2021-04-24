@@ -15,3 +15,11 @@ export const editRoomValidation = (body) => {
     });
     return editRoomSchema.validate(body);
 };
+
+export const updateGusetsValidation = (body) => {
+    const updateGuestsSchema = Joi.object({
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+    });
+    return updateGuestsSchema.validate(body);
+};

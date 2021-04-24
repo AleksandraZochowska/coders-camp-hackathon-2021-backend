@@ -1,10 +1,9 @@
 import { UserModel } from "../../models/users/userSchema.js";
 import Controller from "../Controller.js";
-import { roomValidation } from "./roomValidation.js";
 import RoomModel from "../../models/rooms/roomSchema.js";
 import mongoose from "mongoose";
 import CollectionModel from "../../models/collections/collectionSchema.js";
-import { editRoomValidation } from "./roomValidation.js";
+import { editRoomValidation, updateGusetsValidation, roomValidation } from "./roomValidation.js";
 
 class RoomController extends Controller {
     constructor() {
@@ -81,7 +80,41 @@ class RoomController extends Controller {
         }
     }
 
-    // async updateGuest(req, res) {}
+    async updateGuests(req, res) {
+        const { error } = updateGusetsValidation(req.body);
+        if (error) return this.showError(res, 400, error.details);
+        try {
+            const { email, name } = req.body;
+            const room = await RoomModel.findById(req.params.id);
+            if (!room) return this.showError(res, 404, "No room with given id found");
+
+            const emailIndex = this.findGuestIndex(room, email);
+            if (emailIndex == -1) {
+                const guest = {
+                    email: email,
+                    name: name,
+                    answers: [],
+                };
+                room.guests.push(guest);
+                await room.save();
+                return this.success(res, guest);
+            } else {
+                // update name for existing email in guests list
+                room.guests[emailIndex] = {
+                    email: email,
+                    name: name,
+                };
+                await room.save();
+                return this.success(res, room.guests[emailIndex]);
+            }
+        } catch (error) {
+            return this.showError(res, 500, error);
+        }
+    }
+
+    findGuestIndex(room, email) {
+        return room.guests.map((guest) => guest.email).indexOf(email);
+    }
 }
 
 export default RoomController;
