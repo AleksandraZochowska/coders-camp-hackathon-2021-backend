@@ -13,7 +13,6 @@ const roomSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
-
         questionsCollection: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Collection",

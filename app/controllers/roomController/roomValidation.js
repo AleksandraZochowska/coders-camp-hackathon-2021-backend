@@ -7,3 +7,11 @@ export const roomValidation = (body) => {
     });
     return roomSchema.validate(body);
 };
+
+export const editRoomValidation = (body) => {
+    const editRoomSchema = Joi.object({
+        name: Joi.string(),
+        collectionId: Joi.string(),
+    });
+    return editRoomSchema.validate(body);
+};

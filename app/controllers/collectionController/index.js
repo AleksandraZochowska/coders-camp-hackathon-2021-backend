@@ -14,3 +14,8 @@ export const getCollectionById = (req, res) => {
 export const createCollection = (req, res) => {
     collection.createCollection(req, res);
 };
+
+// PATCH:
+export const updateCollection = (req, res) => {
+    collection.updateCollection(req, res);
+};
