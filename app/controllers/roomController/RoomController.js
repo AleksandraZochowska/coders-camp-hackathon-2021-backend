@@ -10,6 +10,40 @@ class RoomController extends Controller {
     constructor() {
         super();
     }
+    async getActiveQuestion(req, res) {
+        const { email } = req.query;
+        try {
+            const room = await RoomModel.findById(req.params.id, (err) => {
+                if (err) return this.showError(res, 404, "No room with given id found");
+            });
+
+            //Check if guest is in room
+            const guestIndex = room.guests.map((guest) => guest.email).indexOf(email);
+            if (guestIndex === -1) return this.showError(res, 404, "No guest with given email exists within the room");
+            const guest = room.guests[guestIndex];
+
+            // No questions were asked in this room
+            if (room.questionsAsked.length === 0) return this.success(res, false);
+
+            // Some questions have been asked in this room
+            if (room.questionsAsked.length > 0) {
+                const lastQuestion = await QuestionModel.findById(`${room.questionsAsked[room.questionsAsked.length - 1]._id}`);
+                if (!lastQuestion) return this.showError(res, 404, "No question with given ID found");
+
+                // Last asked question is still valid (time-wise)
+                if (Math.floor((new Date() - room.questionsAsked[room.questionsAsked.length - 1].askedAt) / 1000) < lastQuestion.timeForAnswer) {
+                    // Guest has answered this question before
+                    if (guest.answers.map((answer) => answer.questionId).includes(lastQuestion._id)) return this.success(res, false);
+                    // Question is active & have not yet been answered by the guest
+                    return this.success(res, lastQuestion);
+                }
+                return this.success(res, false);
+            }
+        } catch (err) {
+            return this.showError(res, 500, err.reason.error);
+        }
+    }
+
     async getRooms(req, res) {
         const user = await UserModel.findById(req.userId);
         if (!user) return this.showError(res, 400, `You are not a logged user.`);
@@ -89,7 +123,7 @@ class RoomController extends Controller {
                     if (!lastQuestion) return this.showError(res, 404, "No question with given ID found");
                     // console.log(room.questionsAsked[room.questionsAsked.length - 1]);
 
-                    if (Math.floor((new Date() - room.questionsAsked[room.questionsAsked.length - 1].askedAt) / 1000) < 5) {
+                    if (Math.floor((new Date() - room.questionsAsked[room.questionsAsked.length - 1].askedAt) / 1000) < lastQuestion.timeForAnswer) {
                         return this.showError(res, 400, "Cannot ask new question yet, another question is still active");
                     }
                 }
