@@ -6,8 +6,10 @@ const router = express.Router();
 
 // GET
 router.get("", tokenVerification, roomController.getRooms);
+router.get("/:id/answers", roomController.getAnswers);
 router.get("/:id/activequestion", roomController.getActiveQuestion);
 router.get("/:id", tokenVerification, roomController.getRoomById);
+
 
 // POST:
 router.post("/", tokenVerification, roomController.createRoom);

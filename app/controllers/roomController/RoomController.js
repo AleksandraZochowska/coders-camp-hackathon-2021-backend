@@ -171,6 +171,28 @@ class RoomController extends Controller {
         }
     }
 
+    async getAnswers(req, res) {
+        const email = req.query.email;
+
+        try {
+            //Get room
+            const room = await RoomModel.findById(req.params.id);
+            if (!room) return this.showError(res, 404, "No room with given id found");
+
+            //Check if guest is in room
+            const guestIndex = room.guests.map((guest) => guest.email).indexOf(email);
+            if (guestIndex === -1) return this.showError(res, 404, "No guest with given email exists within the room");
+
+            const guest = room.guests[guestIndex];
+
+            const summary = await this.summarizeGuest(guest, room.questionsAsked);
+
+            return this.success(res, summary);
+        } catch (error) {
+            return this.showError(res, 500);
+        }
+    }
+
     async updateGuests(req, res) {
         const { error } = updateGusetsValidation(req.body);
         if (error) return this.showError(res, 400, error.details);
@@ -238,6 +260,37 @@ class RoomController extends Controller {
     findGuestIndex(room, email) {
         const emails = room.guests.map((guest) => guest.email);
         return emails.indexOf(email);
+    }
+
+    async summarizeGuest(guest, questionsAsked) {
+        const { email, name, answers } = guest;
+
+        const result = {
+            email,
+            name,
+            questions: [],
+        };
+
+        //tu bangla
+        for (const askedQuestion of questionsAsked) {
+            const question = await QuestionModel.findById(`${askedQuestion._id}`);
+            console.log(question);
+            const guestAnswerIndex = answers.map((ans) => ans.questionId).indexOf(`${question._id}`);
+
+            const guestAnswerDetails = guestAnswerIndex > -1 ? answers[guestAnswerIndex] : null;
+
+            const entry = {
+                text: question.text,
+                correctAnswer: question.answers[question.correctAnswer],
+                guestAnswer: guestAnswerDetails ? question.answers[guestAnswerDetails.chosenAnswer] : "",
+                answeredAt: guestAnswerDetails ? guestAnswerDetails.answeredAt : "",
+                correct: question.correctAnswer === guestAnswerDetails.chosenAnswer,
+            };
+
+            result.questions.push(entry);
+        }
+
+        return result;
     }
 }
 

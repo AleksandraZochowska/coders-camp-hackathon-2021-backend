@@ -29,3 +29,7 @@ export const updateGuests = (req, res) => {
 export const answerQuestion = (req, res) => {
     room.answerQuestion(req, res);
 };
+
+export const getAnswers = (req, res) => {
+    room.getAnswers(req, res);
+};
