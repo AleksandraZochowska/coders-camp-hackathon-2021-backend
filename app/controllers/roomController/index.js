@@ -33,3 +33,7 @@ export const answerQuestion = (req, res) => {
 export const getAnswers = (req, res) => {
     room.getAnswers(req, res);
 };
+
+export const getSummary = (req, res) => {
+    room.getSummary(req, res);
+};

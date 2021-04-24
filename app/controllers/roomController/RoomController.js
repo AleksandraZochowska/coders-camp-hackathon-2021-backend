@@ -253,6 +253,47 @@ class RoomController extends Controller {
         }
     }
 
+    async getSummary(req, res) {
+        const user = await UserModel.findById(req.userId);
+        if (!user) return this.showError(res, 404, `User not found`);
+
+        try {
+            //Get room
+            const room = await RoomModel.findById(req.params.id);
+            if (!room) return this.showError(res, 404, "Room not found");
+
+            //Check if user owns room
+
+            if (user.id !== `${room.ownerId}`) return this.showError(res, 401, "You must be room owner to access this data");
+
+            const result = {
+                guests: [],
+                questions: [],
+            };
+
+            for (const guest of room.guests) {
+                const guestSummary = await this.summarizeGuest(guest, room.questionsAsked);
+                result.guests.push(guestSummary);
+            }
+
+            result.questions = result.guests[0].questions.map(({ text, correctAnswer }) => {
+                return { text, correctAnswer, allAnswers: 0, correctAnswers: 0 };
+            });
+
+            for (const guest of result.guests) {
+                guest.questions.forEach((question, index) => {
+                    if (question.correct) result.questions[index].correctAnswers++;
+                    if (question.guestAnswer) result.questions[index].allAnswers++;
+                });
+            }
+
+            return this.success(res, result);
+        } catch (error) {
+            console.log(error);
+            return this.showError(res, 500);
+        }
+    }
+
     findGuestIndex(room, email) {
         const emails = room.guests.map((guest) => guest.email);
         return emails.indexOf(email);
@@ -264,27 +305,31 @@ class RoomController extends Controller {
         const result = {
             email,
             name,
+            questionsAll: questionsAsked.length,
+            questionsAnswered: 0,
+            questionsCorrect: 0,
             questions: [],
         };
 
-        //tu bangla
         for (const askedQuestion of questionsAsked) {
             const question = await QuestionModel.findById(`${askedQuestion._id}`);
-            console.log(question);
             const guestAnswerIndex = answers.map((ans) => ans.questionId).indexOf(`${question._id}`);
 
-            const guestAnswerDetails = guestAnswerIndex > -1 ? answers[guestAnswerIndex] : null;
+            const guestAnswerDetails = guestAnswerIndex > -1 ? answers[guestAnswerIndex] : false;
 
             const entry = {
                 text: question.text,
                 correctAnswer: question.answers[question.correctAnswer],
-                guestAnswer: guestAnswerDetails ? question.answers[guestAnswerDetails.chosenAnswer] : "",
-                answeredAt: guestAnswerDetails ? guestAnswerDetails.answeredAt : "",
+                guestAnswer: guestAnswerDetails ? question.answers[guestAnswerDetails.chosenAnswer] : false,
+                answeredAt: guestAnswerDetails ? guestAnswerDetails.answeredAt : false,
                 correct: question.correctAnswer === guestAnswerDetails.chosenAnswer,
             };
 
             result.questions.push(entry);
         }
+
+        result.questionsAnswered = result.questions.filter((qst) => qst.guestAnswer).length;
+        result.questionsCorrect = result.questions.filter((qst) => qst.correct).length;
 
         return result;
     }
