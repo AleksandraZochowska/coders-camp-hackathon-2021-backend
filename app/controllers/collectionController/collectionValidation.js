@@ -14,3 +14,10 @@ export const updateCollectionValidation = (body) => {
     }).min(1);
     return updateCollectionSchema.validate(body);
 };
+
+export const createCollectionValidation = (body) => {
+    const createCollectionSchema = Joi.object({
+        name: Joi.string().required(),
+    });
+    return createCollectionSchema.validate(body);
+};

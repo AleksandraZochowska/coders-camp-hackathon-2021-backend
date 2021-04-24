@@ -10,8 +10,12 @@ export const getCollectionById = (req, res) => {
     collection.getCollectionById(req, res);
 };
 
-// PATCH:
+// POST:
+export const createCollection = (req, res) => {
+    collection.createCollection(req, res);
+};
 
+// PATCH:
 export const updateCollection = (req, res) => {
     collection.updateCollection(req, res);
 };
