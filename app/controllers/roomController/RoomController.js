@@ -13,7 +13,7 @@ class RoomController extends Controller {
         if (!user) return this.showError(res, 400, `You are not a logged user.`);
 
         try {
-            const rooms = await RoomModel.find({ ownerId: req.userId }).populate("questionCollections");
+            const rooms = await RoomModel.find({ ownerId: req.userId }).populate("questionsCollection");
             return this.success(res, rooms);
         } catch (err) {
             return this.showError(res, 500, err);
@@ -32,15 +32,14 @@ class RoomController extends Controller {
         const room = new RoomModel({
             name: req.body.name,
             ownerId: mongoose.Types.ObjectId(req.userId),
-            questionCollections: req.body.questionCollection,
+            questionsCollection: req.body.questionsCollection,
             questionsAsked: [],
             guests: [],
         });
-        console.log(room);
 
         try {
             await room.save();
-            return this.success(res, `Room ${req.body.name} created`);
+            return this.success(res, room);
         } catch (err) {
             return this.showError(res, 500, err); //`Error, room ${req.body.name} not created`
         }

@@ -14,7 +14,7 @@ const roomSchema = new mongoose.Schema(
             required: true,
         },
 
-        questionCollections: {
+        questionsCollection: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Collection",
             required: true,
