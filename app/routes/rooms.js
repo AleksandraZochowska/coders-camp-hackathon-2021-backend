@@ -18,5 +18,6 @@ router.post("/:id/answers", roomController.answerQuestion);
 // PATCH:
 router.patch("/:id", tokenVerification, roomController.editRoom);
 router.patch("/:id/guests", roomController.updateGuests);
-
+router.patch("/:id/close", tokenVerification, roomController.closeRoom);
+router.patch("/:id/open", tokenVerification, roomController.openRoom);
 export default router;

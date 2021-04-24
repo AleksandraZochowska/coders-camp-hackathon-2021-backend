@@ -26,6 +26,14 @@ export const updateGuests = (req, res) => {
     room.updateGuests(req, res);
 };
 
+export const openRoom = (req, res) => {
+    room.openRoom(req, res);
+};
+
+export const closeRoom = (req, res) => {
+    room.closeRoom(req, res);
+};
+
 export const answerQuestion = (req, res) => {
     room.answerQuestion(req, res);
 };

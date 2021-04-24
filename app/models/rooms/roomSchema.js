@@ -13,6 +13,13 @@ const roomSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
+
+        closed: {
+            type: Boolean,
+            required: true,
+            default: false,
+        },
+
         questionsCollectionId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Collection",
