@@ -55,7 +55,7 @@ class RoomController extends Controller {
             const room = await RoomModel.findById(req.params.id);
             if (!room) return this.showError(res, 404, "No room with given id found");
 
-            if (room.ownerId !== req.userId) return this.showError(res, 401);
+            if (`${room.ownerId}` !== req.userId) return this.showError(res, 401);
 
             if (req.body.name) {
                 const nameTaken = await RoomModel.findOne({ name: `${req.body.name}`, ownerId: req.userId });
