@@ -15,7 +15,7 @@ class RoomController extends Controller {
         if (!user) return this.showError(res, 400, `You are not a logged user.`);
 
         try {
-            const rooms = await RoomModel.find({ ownerId: req.userId }).populate("questionsCollection");
+            const rooms = await RoomModel.find({ ownerId: req.userId }).populate("questionsCollectionId");
             return this.success(res, rooms);
         } catch (err) {
             return this.showError(res, 500, err);
@@ -34,7 +34,7 @@ class RoomController extends Controller {
         const room = new RoomModel({
             name: req.body.name,
             ownerId: mongoose.Types.ObjectId(req.userId),
-            questionsCollection: req.body.questionsCollection,
+            questionsCollectionId: req.body.questionsCollectionId,
             questionsAsked: [],
             guests: [],
         });
@@ -71,7 +71,7 @@ class RoomController extends Controller {
                 });
                 if (!collectionExists) return this.showError(res, 404, "No collection with provided ID found");
 
-                room.questionsCollection = `${req.body.collectionId}`;
+                room.questionsCollectionId = `${req.body.collectionId}`;
             }
 
             const savedRoom = await room.save();
