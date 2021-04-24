@@ -9,6 +9,7 @@ router.get("", tokenVerification, roomController.getRooms);
 
 // POST:
 router.post("/", tokenVerification, roomController.createRoom);
+router.post("/:id/answers", roomController.answerQuestion);
 
 // PATCH:
 router.patch("/:id", tokenVerification, roomController.editRoom);

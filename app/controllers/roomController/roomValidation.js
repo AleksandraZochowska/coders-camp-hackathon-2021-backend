@@ -30,3 +30,12 @@ export const updateGusetsValidation = (body) => {
     });
     return updateGuestsSchema.validate(body);
 };
+
+export const answerQuestionValidation = (body) => {
+    const answerQuestionSchema = Joi.object({
+        questionId: Joi.string().required(),
+        answer: Joi.number().integer().required(),
+        email: Joi.string().email().required(),
+    });
+    return answerQuestionSchema.validate(body);
+};
