@@ -1,6 +1,7 @@
 import Controller from "../Controller.js";
 import CollectionModel from "../../models/collections/collectionSchema.js";
 import { createCollectionValidation } from "./collectionValidation.js";
+import QuestionModel from "../../models/questions/questionSchema.js";
 import { UserModel } from "../../models/users/userSchema.js";
 import { updateCollectionValidation } from "./collectionValidation.js";
 
