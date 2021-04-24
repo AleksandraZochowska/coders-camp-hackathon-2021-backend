@@ -39,6 +39,7 @@ class CollectionController extends Controller {
 
             const collections = await CollectionModel.find({ ownerId: req.userId }, "name questions").populate(
                 "questions",
+                "text answers correctAnswer timeForAnswer",
             );
 
             return this.success(res, collections);
@@ -52,7 +53,10 @@ class CollectionController extends Controller {
             const user = await UserModel.findById(req.userId);
             if (!user) return this.showError(res, 404, "User not found");
 
-            const collection = await CollectionModel.findById(req.params.id, "name questions").populate("questions");
+            const collection = await CollectionModel.findById(req.params.id, "name questions").populate(
+                "questions",
+                "text answers correctAnswer timeForAnswer",
+            );
             if (!collection) return this.showError(res, 404, "Collection not found");
 
             return this.success(res, collection);
