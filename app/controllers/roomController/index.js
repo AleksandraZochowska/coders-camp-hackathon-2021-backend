@@ -17,3 +17,7 @@ export const editRoom = (req, res) => {
 export const updateGuests = (req, res) => {
     room.updateGuests(req, res);
 };
+
+export const answerQuestion = (req, res) => {
+    room.answerQuestion(req, res);
+};

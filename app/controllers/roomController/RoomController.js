@@ -1,6 +1,6 @@
 import { UserModel } from "../../models/users/userSchema.js";
 import Controller from "../Controller.js";
-import { roomValidation, editRoomValidation, updateGusetsValidation } from "./roomValidation.js";
+import { roomValidation, editRoomValidation, updateGusetsValidation, answerQuestionValidation } from "./roomValidation.js";
 import RoomModel from "../../models/rooms/roomSchema.js";
 import mongoose from "mongoose";
 import CollectionModel from "../../models/collections/collectionSchema.js";
@@ -135,6 +135,42 @@ class RoomController extends Controller {
                 await room.save();
                 return this.success(res, room.guests[emailIndex]);
             }
+        } catch (error) {
+            return this.showError(res, 500, error);
+        }
+    }
+
+    async answerQuestion(req, res) {
+        //Validate request
+        const { error } = answerQuestionValidation(req.body);
+        if (error) return this.showError(res, 400, error.details);
+
+        const { questionId, answer, email } = req.body;
+
+        try {
+            //Get room
+            const room = await RoomModel.findById(req.params.id);
+            if (!room) return this.showError(res, 404, "No room with given id found");
+
+            //Check if guest is in room
+            const guestIndex = room.guests.map((guest) => guest.email).indexOf(email);
+            if (guestIndex === -1) return this.showError(res, 404, "No guest with given email exists within the room");
+
+            const guest = room.guests[guestIndex];
+
+            //Check if guest answered this question before:
+            if (guest.answers.map((answer) => answer.questionId).includes(questionId)) return this.showError(res, 404, "Question already answered");
+
+            //Add guest's answer
+            const finalAnswer = {
+                questionId,
+                chosenAnswer: answer,
+                answeredAt: Date.now(),
+            };
+
+            guest.answers.push(finalAnswer);
+            await room.save();
+            return this.success(res, finalAnswer);
         } catch (error) {
             return this.showError(res, 500, error);
         }
