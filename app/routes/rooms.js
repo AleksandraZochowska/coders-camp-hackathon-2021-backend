@@ -4,6 +4,9 @@ import tokenVerification from "../middlewares/tokenVerification.js";
 
 const router = express.Router();
 
+// GET
+router.get("", tokenVerification, roomController.getRooms);
+
 // POST:
 router.post("/", tokenVerification, roomController.createRoom);
 router.post("/:id/guests", roomController.updateGuest);
