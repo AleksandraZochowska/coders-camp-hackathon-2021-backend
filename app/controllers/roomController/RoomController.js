@@ -1,6 +1,6 @@
 import { UserModel } from "../../models/users/userSchema.js";
 import Controller from "../Controller.js";
-import { roomValidation, editRoomValidation, updateGusetsValidation } from "./roomValidation.js";
+import { roomValidation, editRoomValidation, updateGusetsValidation, answerQuestionValidation } from "./roomValidation.js";
 import RoomModel from "../../models/rooms/roomSchema.js";
 import mongoose from "mongoose";
 import CollectionModel from "../../models/collections/collectionSchema.js";
@@ -9,6 +9,23 @@ import QuestionModel from "../../models/questions/questionSchema.js";
 class RoomController extends Controller {
     constructor() {
         super();
+        this.populateQuery = [
+            {
+                path: "questionsCollectionId",
+                model: "Collection",
+                populate: {
+                    path: "questions",
+                    model: "Question",
+                },
+            },
+            {
+                path: "questionsAsked",
+                populate: {
+                    path: "_id",
+                    model: "Question",
+                },
+            },
+        ];
     }
     async getActiveQuestion(req, res) {
         const { email } = req.query;
@@ -49,8 +66,21 @@ class RoomController extends Controller {
         if (!user) return this.showError(res, 400, `You are not a logged user.`);
 
         try {
-            const rooms = await RoomModel.find({ ownerId: req.userId }).populate("questionsCollectionId");
+            const rooms = await RoomModel.find({ ownerId: req.userId }).populate(this.populateQuery);
             return this.success(res, rooms);
+        } catch (err) {
+            return this.showError(res, 500, err);
+        }
+    }
+
+    async getRoomById(req, res) {
+        const user = await UserModel.findById(req.userId);
+        if (!user) return this.showError(res, 400, `You are not a logged user.`);
+
+        try {
+            const room = await RoomModel.findById(req.params.id).populate(this.populateQuery);
+            if (`${room.ownerId}` != req.userId) this.showError(res, 401, `The room does not belons to you`);
+            return this.success(res, room);
         } catch (err) {
             return this.showError(res, 500, err);
         }
@@ -161,21 +191,56 @@ class RoomController extends Controller {
                 await room.save();
                 return this.success(res, guest);
             } else {
-                // update name for existing email in guests list
-                room.guests[emailIndex] = {
-                    email: email,
-                    name: name,
-                };
-                await room.save();
-                return this.success(res, room.guests[emailIndex]);
+                // do nothing
+                const guest = room.guests[emailIndex];
+                return this.success(res, `Guest ${guest.name} with email ${guest.email} already added to this room`);
             }
         } catch (error) {
             return this.showError(res, 500, error);
         }
     }
 
+    async answerQuestion(req, res) {
+        //Validate request
+        const { error } = answerQuestionValidation(req.body);
+        if (error) return this.showError(res, 400, error.details);
+
+        const { questionId, answer, email } = req.body;
+
+        try {
+            //Get room
+            const room = await RoomModel.findById(req.params.id);
+            if (!room) return this.showError(res, 404, "No room with given id found");
+
+            //Check if guest is in room
+            const guestIndex = room.guests.map((guest) => guest.email).indexOf(email);
+            if (guestIndex === -1) return this.showError(res, 404, "No guest with given email exists within the room");
+
+            const guest = room.guests[guestIndex];
+
+            //Check if guest answered this question before:
+            if (guest.answers.map((answer) => answer.questionId).includes(questionId)) return this.showError(res, 404, "Question already answered");
+
+            //Add guest's answer
+            const finalAnswer = {
+                questionId,
+                chosenAnswer: answer,
+                answeredAt: Date.now(),
+            };
+
+            guest.answers.push(finalAnswer);
+            await room.save();
+            return this.success(res, finalAnswer);
+        } catch (error) {
+            return this.showError(res, 500, error);
+        }
+    }
+
     findGuestIndex(room, email) {
-        return room.guests.map((guest) => guest.email).indexOf(email);
+        const emails = room.guests.map((guest) => guest.email);
+        console.log(emails);
+        console.log(emails.indexOf(email));
+        return emails.indexOf(email);
     }
 }
 

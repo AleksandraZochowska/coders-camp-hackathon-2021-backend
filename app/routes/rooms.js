@@ -7,9 +7,11 @@ const router = express.Router();
 // GET
 router.get("", tokenVerification, roomController.getRooms);
 router.get("/:id/activequestion", roomController.getActiveQuestion);
+router.get("/:id", tokenVerification, roomController.getRoomById);
 
 // POST:
 router.post("/", tokenVerification, roomController.createRoom);
+router.post("/:id/answers", roomController.answerQuestion);
 
 // PATCH:
 router.patch("/:id", tokenVerification, roomController.editRoom);
