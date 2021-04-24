@@ -71,7 +71,7 @@ class RoomController extends Controller {
                 });
                 if (!collectionExists) return this.showError(res, 404, "No collection with provided ID found");
 
-                room.questionCollection = `${req.body.collectionId}`;
+                room.questionsCollection = `${req.body.collectionId}`;
             }
 
             const savedRoom = await room.save();
