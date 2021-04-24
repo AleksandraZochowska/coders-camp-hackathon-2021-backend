@@ -22,11 +22,10 @@ const roomSchema = new mongoose.Schema(
         questionsAsked: {
             type: [
                 {
-                    _id: mongoose.Schema.Types.ObjectId,
+                    id: { type: mongoose.Schema.Types.ObjectId, ref: "Question" },
                     askedAt: Date,
                 },
             ],
-            ref: "Question",
             required: true,
         },
 
