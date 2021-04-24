@@ -9,9 +9,16 @@ export const roomValidation = (body) => {
 };
 
 export const editRoomValidation = (body) => {
-    const editRoomSchema = Joi.object({
-        name: Joi.string(),
-        collectionId: Joi.string(),
-    });
+    const editRoomSchema = Joi.alternatives().try(
+        Joi.object({
+            name: Joi.string().required(),
+        }),
+        Joi.object({
+            collectionId: Joi.string().required(),
+        }),
+        Joi.object({
+            selectedQuestionId: Joi.string().required(),
+        }),
+    );
     return editRoomSchema.validate(body);
 };

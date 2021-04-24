@@ -1,10 +1,10 @@
 import { UserModel } from "../../models/users/userSchema.js";
 import Controller from "../Controller.js";
-import { roomValidation } from "./roomValidation.js";
+import { roomValidation, editRoomValidation } from "./roomValidation.js";
 import RoomModel from "../../models/rooms/roomSchema.js";
 import mongoose from "mongoose";
 import CollectionModel from "../../models/collections/collectionSchema.js";
-import { editRoomValidation } from "./roomValidation.js";
+import QuestionModel from "../../models/questions/questionSchema.js";
 
 class RoomController extends Controller {
     constructor() {
@@ -57,6 +57,7 @@ class RoomController extends Controller {
 
             if (`${room.ownerId}` !== req.userId) return this.showError(res, 401);
 
+            // Change room name
             if (req.body.name) {
                 const nameTaken = await RoomModel.findOne({ name: `${req.body.name}`, ownerId: req.userId });
                 if (nameTaken) return this.showError(res, 400, "Room with this name already exists");
@@ -64,6 +65,7 @@ class RoomController extends Controller {
                 room.name = `${req.body.name}`;
             }
 
+            // Change collection attached to the room
             if (req.body.collectionId) {
                 const collectionExists = await CollectionModel.findOne({
                     _id: `${req.body.collectionId}`,
@@ -72,6 +74,31 @@ class RoomController extends Controller {
                 if (!collectionExists) return this.showError(res, 404, "No collection with provided ID found");
 
                 room.questionsCollectionId = `${req.body.collectionId}`;
+            }
+
+            // Add new active question
+            if (req.body.selectedQuestionId) {
+                const collection = await CollectionModel.findById(room.questionsCollectionId);
+                if (!collection) return this.showError(res, 404, "No collection attached to the room");
+
+                const questionInCollection = collection.questions.some((el) => `${el}` === `${req.body.selectedQuestionId}`);
+                if (!questionInCollection) return this.showError(res, 404, "No question with gived ID found in currently attached collection");
+
+                if (room.questionsAsked.length > 0) {
+                    const lastQuestion = await QuestionModel.findById(`${room.questionsAsked[room.questionsAsked.length - 1]._id}`);
+                    if (!lastQuestion) return this.showError(res, 404, "No question with given ID found");
+                    // console.log(room.questionsAsked[room.questionsAsked.length - 1]);
+
+                    if (Math.floor((new Date() - room.questionsAsked[room.questionsAsked.length - 1].askedAt) / 1000) < 5) {
+                        return this.showError(res, 400, "Cannot ask new question yet, another question is still active");
+                    }
+                }
+
+                const questionCard = {
+                    _id: req.body.selectedQuestionId,
+                    askedAt: new Date(),
+                };
+                room.questionsAsked.push(questionCard);
             }
 
             const savedRoom = await room.save();
