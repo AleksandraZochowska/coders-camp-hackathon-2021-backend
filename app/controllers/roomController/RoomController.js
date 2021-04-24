@@ -45,19 +45,49 @@ class RoomController extends Controller {
             // Some questions have been asked in this room
             if (room.questionsAsked.length > 0) {
                 const lastQuestion = await QuestionModel.findById(`${room.questionsAsked[room.questionsAsked.length - 1]._id}`);
+
                 if (!lastQuestion) return this.showError(res, 404, "No question with given ID found");
+
+                const currentStatus = {
+                    activeQuestion: lastQuestion,
+                    roomClosed: room.closed,
+                };
 
                 // Last asked question is still valid (time-wise)
                 if (Math.floor((new Date() - room.questionsAsked[room.questionsAsked.length - 1].askedAt) / 1000) < lastQuestion.timeForAnswer) {
                     // Guest has answered this question before
                     if (guest.answers.map((answer) => answer.questionId).includes(lastQuestion._id)) return this.success(res, false);
+
                     // Question is active & have not yet been answered by the guest
-                    return this.success(res, lastQuestion);
+                    return this.success(res, currentStatus);
                 }
-                return this.success(res, false);
+                currentStatus.activeQuestion = false;
+                return this.success(res, currentStatus);
             }
         } catch (err) {
             return this.showError(res, 500, err.reason.error);
+        }
+    }
+
+    async closeRoom(req, res) {
+        try {
+            const room = await RoomModel.findById(req.params.id).populate(this.populateQuery);
+            if (room.ownerId != req.userId) return this.showError(res, 400, `You cannot change close room that not belongs to you.`);
+            await RoomModel.findByIdAndUpdate(req.params.id, { $set: { closed: true } });
+            this.success(res, "Room closed");
+        } catch (err) {
+            return this.showError(res, 500, err);
+        }
+    }
+
+    async openRoom(req, res) {
+        try {
+            const room = await RoomModel.findById(req.params.id).populate(this.populateQuery);
+            if (room.ownerId != req.userId) return this.showError(res, 400, `You cannot change open the room that not belongs to you.`);
+            await RoomModel.findByIdAndUpdate(req.params.id, { $set: { closed: false } });
+            this.success(res, "Room opened");
+        } catch (err) {
+            return this.showError(res, 500, err);
         }
     }
 
@@ -270,7 +300,6 @@ class RoomController extends Controller {
         //tu bangla
         for (const askedQuestion of questionsAsked) {
             const question = await QuestionModel.findById(`${askedQuestion._id}`);
-            console.log(question);
             const guestAnswerIndex = answers.map((ans) => ans.questionId).indexOf(`${question._id}`);
 
             const guestAnswerDetails = guestAnswerIndex > -1 ? answers[guestAnswerIndex] : null;
