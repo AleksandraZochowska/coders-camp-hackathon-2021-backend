@@ -14,6 +14,6 @@ export const editRoom = (req, res) => {
     room.editRoom(req, res);
 };
 
-export const updateGuest = (req, res) => {
-    room.editRoom(req, res);
+export const updateGuests = (req, res) => {
+    room.updateGuests(req, res);
 };
