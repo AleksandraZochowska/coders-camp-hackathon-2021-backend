@@ -37,10 +37,7 @@ class CollectionController extends Controller {
             const user = await UserModel.findById(req.userId);
             if (!user) return this.showError(res, 404, "User not found");
 
-            const collections = await CollectionModel.find({ ownerId: req.userId }, "name questions").populate(
-                "questions",
-                "text answers correctAnswer timeForAnswer",
-            );
+            const collections = await CollectionModel.find({ ownerId: req.userId }, "name questions").populate("questions", "text answers correctAnswer timeForAnswer");
 
             return this.success(res, collections);
         } catch (error) {
@@ -53,10 +50,7 @@ class CollectionController extends Controller {
             const user = await UserModel.findById(req.userId);
             if (!user) return this.showError(res, 404, "User not found");
 
-            const collection = await CollectionModel.findById(req.params.id, "name questions").populate(
-                "questions",
-                "text answers correctAnswer timeForAnswer",
-            );
+            const collection = await CollectionModel.findById(req.params.id, "name questions").populate("questions", "text answers correctAnswer timeForAnswer");
             if (!collection) return this.showError(res, 404, "Collection not found");
 
             return this.success(res, collection);
@@ -92,7 +86,7 @@ class CollectionController extends Controller {
             if (!reqQuestion) return this.success(res, "Name changed");
             const question = await QuestionModel.create(reqQuestion);
 
-            const updatedCollection = await CollectionModel.findByIdAndUpdate(req.params.id, {
+            await CollectionModel.findByIdAndUpdate(req.params.id, {
                 $set: { questions: [...collection.questions, question._id] },
             });
 
