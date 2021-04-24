@@ -122,9 +122,11 @@ class RoomController extends Controller {
 
             const guest = room.guests[guestIndex];
 
-            return this.success(res, guest.answers);
+            const summary = await this.summarizeGuest(guest, room.questionsAsked);
+
+            return this.success(res, summary);
         } catch (error) {
-            return this.showError(res, 500, error);
+            return this.showError(res, 500);
         }
     }
 
@@ -198,6 +200,37 @@ class RoomController extends Controller {
 
     findGuestIndex(room, email) {
         return room.guests.map((guest) => guest.email).indexOf(email);
+    }
+
+    async summarizeGuest(guest, questionsAsked) {
+        const { email, name, answers } = guest;
+
+        const result = {
+            email,
+            name,
+            questions: [],
+        };
+
+        //tu bangla
+        for (const askedQuestion of questionsAsked) {
+            const question = await QuestionModel.findById(`${askedQuestion._id}`);
+            console.log(question);
+            const guestAnswerIndex = answers.map((ans) => ans.questionId).indexOf(`${question._id}`);
+
+            const guestAnswerDetails = guestAnswerIndex > -1 ? answers[guestAnswerIndex] : null;
+
+            const entry = {
+                text: question.text,
+                correctAnswer: question.answers[question.correctAnswer],
+                guestAnswer: guestAnswerDetails ? question.answers[guestAnswerDetails.chosenAnswer] : "",
+                answeredAt: guestAnswerDetails ? guestAnswerDetails.answeredAt : "",
+                correct: question.correctAnswer === guestAnswerDetails.chosenAnswer,
+            };
+
+            result.questions.push(entry);
+        }
+
+        return result;
     }
 }
 
