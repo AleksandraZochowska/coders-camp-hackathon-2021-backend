@@ -151,7 +151,6 @@ class RoomController extends Controller {
                 if (room.questionsAsked.length > 0) {
                     const lastQuestion = await QuestionModel.findById(`${room.questionsAsked[room.questionsAsked.length - 1]._id}`);
                     if (!lastQuestion) return this.showError(res, 404, "No question with given ID found");
-                    // console.log(room.questionsAsked[room.questionsAsked.length - 1]);
 
                     if (Math.floor((new Date() - room.questionsAsked[room.questionsAsked.length - 1].askedAt) / 1000) < lastQuestion.timeForAnswer) {
                         return this.showError(res, 400, "Cannot ask new question yet, another question is still active");
@@ -238,8 +237,6 @@ class RoomController extends Controller {
 
     findGuestIndex(room, email) {
         const emails = room.guests.map((guest) => guest.email);
-        console.log(emails);
-        console.log(emails.indexOf(email));
         return emails.indexOf(email);
     }
 }
