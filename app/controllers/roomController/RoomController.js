@@ -157,13 +157,9 @@ class RoomController extends Controller {
                 await room.save();
                 return this.success(res, guest);
             } else {
-                // update name for existing email in guests list
-                room.guests[emailIndex] = {
-                    email: email,
-                    name: name,
-                };
-                await room.save();
-                return this.success(res, room.guests[emailIndex]);
+                // do nothing
+                const guest = room.guests[emailIndex];
+                return this.success(res, `Guest ${guest.name} with email ${guest.email} already added to this room`);
             }
         } catch (error) {
             return this.showError(res, 500, error);
@@ -207,7 +203,10 @@ class RoomController extends Controller {
     }
 
     findGuestIndex(room, email) {
-        return room.guests.map((guest) => guest.email).indexOf(email);
+        const emails = room.guests.map((guest) => guest.email);
+        console.log(emails);
+        console.log(emails.indexOf(email));
+        return emails.indexOf(email);
     }
 }
 
