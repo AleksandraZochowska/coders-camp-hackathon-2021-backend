@@ -11,4 +11,7 @@ router.get("/:id", tokenVerification, collectionController.getCollectionById);
 // POST
 router.post("/", tokenVerification, collectionController.createCollection);
 
+//PATCH
+router.patch("/:id", tokenVerification, collectionController.updateCollection);
+
 export default router;
