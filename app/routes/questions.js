@@ -3,7 +3,7 @@ import express from "express";
 import { getQuestionById } from "../controllers/questionController/index.js";
 const router = express.Router();
 
-// POST:
-router.post("/:id", getQuestionById);
+// GET:
+router.get("/:id", getQuestionById);
 
 export default router;
