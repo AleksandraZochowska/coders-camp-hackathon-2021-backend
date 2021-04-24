@@ -108,6 +108,26 @@ class RoomController extends Controller {
         }
     }
 
+    async getAnswers(req, res) {
+        const email = req.query.email;
+
+        try {
+            //Get room
+            const room = await RoomModel.findById(req.params.id);
+            if (!room) return this.showError(res, 404, "No room with given id found");
+
+            //Check if guest is in room
+            const guestIndex = room.guests.map((guest) => guest.email).indexOf(email);
+            if (guestIndex === -1) return this.showError(res, 404, "No guest with given email exists within the room");
+
+            const guest = room.guests[guestIndex];
+
+            return this.success(res, guest.answers);
+        } catch (error) {
+            return this.showError(res, 500, error);
+        }
+    }
+
     async updateGuests(req, res) {
         const { error } = updateGusetsValidation(req.body);
         if (error) return this.showError(res, 400, error.details);
